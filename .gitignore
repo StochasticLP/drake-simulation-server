@@ -1,0 +1,31 @@
+# Backend ()
+/venv/
+/.venv/
+/grave/
+/__pycache__/
+/**/__pycache__/
+/*.pyc
+/**/*.pyc
+/*.pyo
+/**/*.pyo
+/*.pyd
+/.pytest_cache/
+/.mypy_cache/
+/.dmypy.json
+/dmypy.json
+
+# OS files
+.DS_Store
+*.pem
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp

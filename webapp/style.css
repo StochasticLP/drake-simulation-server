@@ -1,0 +1,11 @@
+#meshcatFrame {
+  width: 800px;
+  height: 600px;
+  border: 1px solid #ccc;
+  margin-top: 1em;
+}
+#meshcatLink {
+  display: block;
+  margin-top: 1em;
+  font-weight: bold;
+}
