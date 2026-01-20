@@ -4,6 +4,9 @@ import time
 from fastapi import FastAPI
 import socketio
 import uvicorn
+import subprocess
+from urllib.parse import urlparse
+import os
 
 # FastAPI and Socket.IO setup
 app = FastAPI()
@@ -13,10 +16,17 @@ sio_app = socketio.ASGIApp(sio, app)
 # Active simulations: sid -> {"sim": Simulation, "timer": task, "last_activity": time}
 active_simulations = {}
 
+import nginx_manager
+
+# Ensure Nginx config directory exists on startup
+nginx_manager.ensure_conf_dir()
+
 async def shutdown(sid):
     if sid in active_simulations:
         sim_data = active_simulations[sid]
         sim_data["sim"].stop()
+        nginx_manager.remove_nginx_conf(sid)
+        nginx_manager.reload_nginx()
         del active_simulations[sid]
         print(f"Shutdown simulation for {sid}")
 
@@ -49,6 +59,20 @@ async def init(sid, params=None):
     sim = Simulation(sid, params)
     await sim.start()
     await sim.ready_event.wait()  # Wait for setup (Meshcat, diagram, init)
+    # Parse port from sim.url (e.g., http://localhost:7001 -> 7001)
+    parsed_url = urlparse(sim.url)
+    meshcat_port = parsed_url.port
+    if not meshcat_port:
+        await sio.emit("error", {"message": "Invalid Meshcat URL"}, to=sid)
+        return
+
+    # Generate conf and reload
+    nginx_manager.generate_nginx_conf(sid, meshcat_port)
+    nginx_manager.reload_nginx()
+
+    # Emit proxied URL
+    proxied_url = f"https://drake.lukedphillips.com/meshcat/{sid}/"
+    await sio.emit("simulation_started", {"url": proxied_url}, to=sid)
     active_simulations[sid] = {"sim": sim, "timer": None, "last_activity": time.time()}
     update_activity(sid)
     await sio.emit("simulation_started", {"url": sim.url}, to=sid)
