@@ -5,6 +5,7 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y \
     python3 python3-pip python3-venv \
     nginx \
+    libx11-6 libsm6 libglib2.0-0 \
     wget curl git \
     && rm -rf /var/lib/apt/lists/*
 

@@ -75,7 +75,6 @@ async def init(sid, params=None):
     await sio.emit("simulation_started", {"url": proxied_url}, to=sid)
     active_simulations[sid] = {"sim": sim, "timer": None, "last_activity": time.time()}
     update_activity(sid)
-    await sio.emit("simulation_started", {"url": sim.url}, to=sid)
 
 @sio.event
 async def get_output(sid):

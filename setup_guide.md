@@ -46,7 +46,13 @@ The application is containerized for easy deployment.
 ### Build the Image
 Build the Docker image on your development machine:
 ```bash
-docker build -t drake-sim-server .
+docker build -t stochasticlp/drake-simulation-server .
+```
+
+### Push to Docker Hub
+Push the image to your repository so it can be pulled on other machines:
+```bash
+docker push stochasticlp/drake-simulation-server:latest
 ```
 
 ### Run the Container
@@ -54,25 +60,30 @@ Run the container, mapping port 8080.
 **Note**: We run with `--net=host` or ensure port mapping is correct. Since Cloudflared is running on the host and pointing to `localhost:8080`, simple port mapping works.
 
 ```bash
-docker run -d -p 8080:8080 --name drake-server drake-sim-server
+docker run -d -p 8080:8080 --name drake-server stochasticlp/drake-simulation-server:latest
 ```
 
 ## 3. Remote Updates
 
 To update the server remotely:
 
-1.  **Push changes** to your git repository.
-2.  **SSH** into the host machine (or use RustDesk).
-3.  **Pull changes**:
+1.  **Push changes** to your git repository and wait for CI/CD or **Build and Push** the new image from your laptop:
     ```bash
-    git pull
+    docker build -t stochasticlp/drake-simulation-server .
+    docker push stochasticlp/drake-simulation-server:latest
     ```
-4.  **Rebuild and Restart**:
+2.  **SSH** into the host machine (or use RustDesk).
+3.  **Update the Container**:
     ```bash
+    # Stop existing
     docker stop drake-server
     docker rm drake-server
-    docker build -t drake-sim-server .
-    docker run -d -p 8080:8080 --name drake-server drake-sim-server
+    
+    # Pull latest
+    docker pull stochasticlp/drake-simulation-server:latest
+    
+    # Run new
+    docker run -d -p 8080:8080 --name drake-server stochasticlp/drake-simulation-server:latest
     ```
 
 ## Troubleshooting

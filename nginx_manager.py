@@ -62,10 +62,11 @@ def remove_nginx_conf(sid):
 def reload_nginx():
     """Reload Nginx to apply changes."""
     try:
-        # Check if we are running as root or have sudo access
+        # Check if we are running as root
         if os.geteuid() == 0:
             subprocess.call(['nginx', '-s', 'reload'])
         else:
+            # Fallback to sudo if not root (for local dev outside docker)
             subprocess.call(['sudo', 'nginx', '-s', 'reload'])
         print("NGINX reloaded successfully")
     except Exception as e:

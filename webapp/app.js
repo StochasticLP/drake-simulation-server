@@ -27,7 +27,7 @@ function enableControls(enable) {
 }
 
 connectBtn.onclick = () => {
-  socket = io("ws://localhost:8000", {transports: ["websocket"],});
+  socket = io("ws://localhost:8080", {transports: ["websocket"],});
   setStatus("Connecting...", "orange");
   let connectTimeout = setTimeout(() => {
     if (!connected) {
